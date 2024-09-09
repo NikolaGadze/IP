@@ -38,13 +38,14 @@
     </div>
 
     <div v-if="detections.length > 0">
-      <h2>Detected:</h2>
-      <ul>
-        <li v-for="(detection, index) in detections" :key="index">
-          {{ detection.name }} at (x: {{ detection.xmin }}, y: {{ detection.ymin }})
-        </li>
-      </ul>
-    </div>
+  <h2>Detected:</h2>
+  <ul>
+    <li v-for="(detection, index) in detections" :key="index">
+      {{ detection.name }} - Confidence: {{ detection.confidence.toFixed(2) }} at (x: {{ detection.xmin }}, y: {{ detection.ymin }})
+    </li>
+  </ul>
+</div>
+
   </div>
 </template>
 
@@ -81,13 +82,14 @@ export default {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          responseType: 'json', // Expect JSON response
         });
 
-        // Get detections from response
+        // Extract detections and image from the response
         this.detections = response.data.detections || [];
 
-        // Generate a URL for the uploaded image to display it
-        this.imageUrl = URL.createObjectURL(this.selectedImage);
+        // Decode the Base64 image
+        this.imageUrl = `data:image/jpeg;base64,${response.data.image}`;
       } catch (error) {
         console.error('Error during image upload and analysis:', error);
         alert('There was an error uploading your image. Please try again.');
@@ -107,6 +109,8 @@ export default {
   },
 };
 </script>
+
+
 
 <style>
 .uploaded-image {
